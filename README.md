@@ -14,7 +14,10 @@ library(RColorBrewer) # palettes
 library(Metrics)     # rmse()
 
 # 2) Read data
-path_to_csv <- "/home/peter/Downloads/wd_2015_ok.csv"
+# Allow supplying a custom CSV path via command line. Fallback to the
+# bundled data file if no argument is provided.
+args <- commandArgs(trailingOnly = TRUE)
+path_to_csv <- if (length(args) > 0) args[1] else "wd_2015_ok.csv"
 if (!file.exists(path_to_csv)) stop("File not found: ", path_to_csv)
 raw_data <- read_csv(path_to_csv)
 
