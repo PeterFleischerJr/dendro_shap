@@ -8,13 +8,19 @@ library(dplyr)       # data manipulation
 library(tidyr)       # pivot_longer
 library(lubridate)   # date parsing, year()
 library(ranger)      # random forest
-library(fastshap)    # SHAP values
+if (!requireNamespace("fastshap", quietly = TRUE)) {
+  message("fastshap package not found, SHAP plots will be skipped")
+  fastshap_available <- FALSE
+} else {
+  library(fastshap)    # SHAP values
+  fastshap_available <- TRUE
+}
 library(ggplot2)     # plotting
 library(RColorBrewer) # palettes
 library(Metrics)     # rmse()
 
 # 2) Read data
-path_to_csv <- "/home/peter/Downloads/wd_2015_ok.csv"
+path_to_csv <- "wd_2015_ok.csv"
 if (!file.exists(path_to_csv)) stop("File not found: ", path_to_csv)
 raw_data <- read_csv(path_to_csv)
 
@@ -95,31 +101,43 @@ for (ind in unique(daily_data$Individual)) {
       mutate(Type = "Individual_Year", Individual = ind, Year = yr)
     metrics_list[[paste0("IndYr_", ind, "_", yr)]] <- m
     
-    # SHAP values & plot
-    shap_vals <- fastshap::explain(
-      object       = rf,
-      X            = df %>% select(TV, swp, VPD),
-      pred_wrapper = function(m, newdata) predict(m, data = newdata)$predictions,
-      nsim         = 10,
-      adjust       = TRUE
-    )
-    shap_df <- bind_cols(Date = df$Date, as.data.frame(shap_vals))
-    shap_long <- pivot_longer(shap_df, cols = c("TV","swp","VPD"),
-                              names_to = "Predictor", values_to = "SHAP")
-    
     baseline <- m$Baseline
-    p <- ggplot() +
-      geom_col(data = shap_long, aes(x = Date, y = SHAP, fill = Predictor),
-               position = "stack", alpha = 0.8) +
-      geom_line(data = df, aes(x = Date, y = Value), color = "black", size = 1) +
-      geom_hline(yintercept = baseline, linetype = "dashed", color = "blue") +
-      scale_fill_brewer(palette = "Set1") +
-      labs(title    = paste(ind, "—", yr),
-           subtitle = paste0("R²=", round(m$R2, 3),
-                             " | RMSE=", round(m$RMSE, 3)),
-           x        = "Date", y = "SHAP & Value") +
-      theme_minimal() + theme(legend.position = "top",
-                              axis.text.x = element_text(angle = 45, hjust = 1))
+    if (fastshap_available) {
+      # SHAP values & plot
+      shap_vals <- fastshap::explain(
+        object       = rf,
+        X            = df %>% select(TV, swp, VPD),
+        pred_wrapper = function(m, newdata) predict(m, data = newdata)$predictions,
+        nsim         = 10,
+        adjust       = TRUE
+      )
+      shap_df <- bind_cols(Date = df$Date, as.data.frame(shap_vals))
+      shap_long <- pivot_longer(shap_df, cols = c("TV","swp","VPD"),
+                                names_to = "Predictor", values_to = "SHAP")
+
+      p <- ggplot() +
+        geom_col(data = shap_long, aes(x = Date, y = SHAP, fill = Predictor),
+                 position = "stack", alpha = 0.8) +
+        geom_line(data = df, aes(x = Date, y = Value), color = "black", size = 1) +
+        geom_hline(yintercept = baseline, linetype = "dashed", color = "blue") +
+        scale_fill_brewer(palette = "Set1") +
+        labs(title    = paste(ind, "—", yr),
+             subtitle = paste0("R²=", round(m$R2, 3),
+                               " | RMSE=", round(m$RMSE, 3)),
+             x        = "Date", y = "SHAP & Value") +
+        theme_minimal() +
+        theme(legend.position = "top",
+              axis.text.x = element_text(angle = 45, hjust = 1))
+    } else {
+      p <- ggplot(df, aes(x = Date, y = Value)) +
+        geom_line(color = "black", size = 1) +
+        geom_hline(yintercept = baseline, linetype = "dashed", color = "blue") +
+        labs(title    = paste(ind, "—", yr),
+             subtitle = paste0("R²=", round(m$R2, 3),
+                               " | RMSE=", round(m$RMSE, 3)),
+             x        = "Date", y = "Value") +
+        theme_minimal()
+    }
     print(p)
   }
 }
