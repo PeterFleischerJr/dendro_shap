@@ -1,0 +1,48 @@
+
+Attaching package: ‘dplyr’
+
+The following objects are masked from ‘package:stats’:
+
+    filter, lag
+
+The following objects are masked from ‘package:base’:
+
+    intersect, setdiff, setequal, union
+
+
+Attaching package: ‘lubridate’
+
+The following objects are masked from ‘package:base’:
+
+    date, intersect, setdiff, union
+
+fastshap package not found, SHAP plots will be skipped
+Rows: 154080 Columns: 16
+── Column specification ────────────────────────────────────────────────────────
+Delimiter: ","
+chr   (1): Date
+dbl  (14): JD1, JD2, JD3, JD4, JD5, JD6, GR, TV, RV, Srazky, PET, VPD, swp, ...
+time  (1): Time
+
+ℹ Use `spec()` to retrieve the full column specification for this data.
+ℹ Specify the column types or set `show_col_types = FALSE` to quiet this message.
+There were 50 or more warnings (use warnings() to see the first 50)
+null device 
+          1 
+# A tibble: 76 × 8
+      R2   RMSE     AIC Baseline Type                Group Individual  Year
+   <dbl>  <dbl>   <dbl>    <dbl> <chr>               <chr> <chr>      <dbl>
+ 1 0.530 0.0653 -11468.  -0.0905 Individual_AllYears JD1   <NA>          NA
+ 2 0.701 0.0474 -12813.  -0.103  Individual_AllYears JD2   <NA>          NA
+ 3 0.459 0.107   -9402.  -0.105  Individual_AllYears JD3   <NA>          NA
+ 4 0.571 0.103   -9570.  -0.148  Individual_AllYears JD4   <NA>          NA
+ 5 0.544 0.0795 -10638.  -0.113  Individual_AllYears JD5   <NA>          NA
+ 6 0.548 0.0598 -11836.  -0.0914 Individual_AllYears JD6   <NA>          NA
+ 7 0.647 0.0342  -8138.  -0.0650 Year_AllIndividuals 2015  <NA>          NA
+ 8 0.447 0.0431  -8068.  -0.0664 Year_AllIndividuals 2016  <NA>          NA
+ 9 0.576 0.0438  -8027.  -0.0807 Year_AllIndividuals 2017  <NA>          NA
+10 0.420 0.151   -4842.  -0.225  Year_AllIndividuals 2018  <NA>          NA
+# ℹ 66 more rows
+Done.
+ • CSV -> model_metrics_results.csv
+ • PDF -> All_Individual_Year_Plots.pdf
