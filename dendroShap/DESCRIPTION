@@ -1,0 +1,11 @@
+Package: dendroShap
+Title: Dendrogram SHAP Analysis Tools
+Version: 0.1.0
+Authors@R: person("Data", "Scientist", email = "datasci@example.com", role = c("aut", "cre"))
+Author: Data Scientist [aut, cre]
+Maintainer: Data Scientist <datasci@example.com>
+Description: Utilities for analyzing SHAP values with dendrogram methods.
+License: MIT
+Encoding: UTF-8
+Roxygen: list(markdown = TRUE)
+RoxygenNote: 7.3.1
